@@ -1,18 +1,25 @@
 <template>
-    <form class="form" @submit.prevent="search()">  
-        <div class="field has-addons search">
-            <p class="control is-expanded">
-                <input class="input" type="text" placeholder="Search for Courses" 
-                v-model="keywords" style="outline: none; box-shadow: none">
-            </p>
-
-            <p class="control">
-                <button type="submit" class="button search-button">
-                  Search
-                </button>
-            </p>
-        </div>
-    </form>
+  <form class="form" @submit.prevent="search()">  
+    <div class="field has-addons">
+      <p class="control">
+        <span class="select">
+          <select class="select" name="type" v-model="type">
+            <option value="keywords">Keywords</option>
+            <option value="course_id">Course ID</option>
+          </select>
+        </span>
+      </p>
+      <p class="control is-expanded">
+        <input class="input" type="text" placeholder="Search for Courses" 
+              v-model="keywords" style="outline: none; box-shadow: none">
+      </p>
+      <p class="control">
+        <a class="button search-button" @click.prevent="search()">
+          Search
+        </a>
+      </p>
+    </div>
+  </form>
 </template>
 
 <script>
@@ -23,19 +30,22 @@ export default {
 
   data() {
     return {
+      type: this.$route.query.type || "keywords",
       keywords: this.$route.query.keywords
     };
   },
 
   methods: {
     search() {
-      if (this.keywords.length < 1) return;
+      if (!this.keywords || this.keywords.length < 1) return;
+      if (this.type == "course_id" && isNaN(this.keywords)) return;
 
       this.$router.push({
         name: this.$route.name === "add-course" ? "add-course" : "home",
         query: {
           ...this.$route.query,
-          keywords: this.keywords
+          keywords: this.keywords,
+          type: this.type
         }
       });
     }

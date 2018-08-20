@@ -50,6 +50,7 @@ export default {
   methods: {
     getCourseList() {
       const keywords = this.$route.query.keywords;
+
       const query = {
         table: "courses"
       };
@@ -59,8 +60,6 @@ export default {
           $regex: RegExp(keywords, "i")
         };
       }
-
-      console.log(query);
 
       DatabaseService.getCourses(query)
         .then(courses => {

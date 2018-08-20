@@ -50,10 +50,15 @@ export default {
     loadCourse() {
       this.loading = true;
 
-      UdemyService.getCourseList(this.$route.query.keywords)
+      UdemyService.getCourseList(this.$route.query)
         .then(response => {
           this.loading = false;
-          this.courses = response.data.results;
+
+          if (response.data.hasOwnProperty("results")) {
+            this.courses = response.data.results;
+          } else {
+            this.courses = [response.data];
+          }
         })
         .catch(e => {
           this.loading = false;
