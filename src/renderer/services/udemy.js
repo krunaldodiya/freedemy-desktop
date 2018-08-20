@@ -7,7 +7,7 @@ export default class Udemy {
 
   getCourseList(query) {
     const keywords = query.keywords;
-    const type = query.type;
+    const type = query.type ? query.type : "keywords";
     let api_url;
 
     if (type == "keywords") {

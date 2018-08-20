@@ -31,8 +31,14 @@ export default {
   data() {
     return {
       type: this.$route.query.type || "keywords",
-      keywords: this.$route.query.keywords
+      keywords: this.$route.query.keywords || null
     };
+  },
+
+  watch: {
+    $route(to, from) {
+      this.keywords = to.query.keywords;
+    }
   },
 
   methods: {
