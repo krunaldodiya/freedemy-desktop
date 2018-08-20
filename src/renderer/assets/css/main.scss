@@ -1,0 +1,21 @@
+@import "~bulma/bulma";
+
+html {
+  background: #404040;
+}
+
+body {
+  font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+  font-family: "Century Gothic", CenturyGothic, Geneva, AppleGothic, sans-serif;
+  font-family: "Trebuchet MS", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", sans-serif;
+  font-family: Consolas, monaco, monospace;
+}
+
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.5s;
+}
+.page-enter,
+.page-leave-active {
+  opacity: 0;
+}
