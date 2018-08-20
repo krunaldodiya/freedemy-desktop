@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <div v-if="!courses.length">Please wait, loading...</div>
+    <div style="padding: 10px" v-if="loading">Please wait, loading...</div>
     <div class="columns is-multiline is-12" style="margin: 0px; list-style: none;" v-if="courses.length">
       <div class="column is-2" v-for="(course, index) in courses" :key="index" v-if="!loading">
         <div style="border: 1px solid #ccc; margin: 1px">
@@ -85,7 +85,6 @@ export default {
 
 <style scoped>
 .wrapper {
-  padding: 20px;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 

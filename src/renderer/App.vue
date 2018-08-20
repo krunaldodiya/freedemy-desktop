@@ -7,17 +7,19 @@
       <div class="column is-7">
         <Header/>
       </div>
-       <div class="column is-3 has-text-right">
-        <router-link to="/course/add" v-if="$route.name !== 'add-course'">
-          <div class="button">
-            Add Course
-          </div>
-        </router-link>
-        <router-link to="/settings">
-          <div class="button">
-            Settings
-          </div>
-        </router-link>
+       <div class="column is-3">
+         <div class="field is-grouped is-pulled-right">
+          <p class="control" v-if="$route.name !== 'add-course'">
+            <router-link class="button is-default" to="/course/add">
+              Browse Courses  
+            </router-link>
+          </p>
+          <p class="control">
+            <router-link class="button is-link" to="/settings">
+              Settings
+            </router-link>
+          </p>
+        </div>
       </div>
     </div>
     <div class="content">

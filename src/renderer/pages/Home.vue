@@ -1,6 +1,6 @@
 <template>
     <div class="wrapper">
-      <div v-if="!courses.length">No course added yet.</div>
+      <div style="padding: 10px" v-if="!courses.length">No course added yet.</div>
       <div class="columns is-multiline is-12" style="margin: 0px; list-style: none;" v-if="courses.length">
           <div class="column is-2" v-for="(course, index) in courses" :key="index">
               <div style="border: 1px solid #ccc; margin: 1px">
@@ -56,9 +56,11 @@ export default {
 
       if (keywords) {
         query["title"] = {
-          $regex: RegExp(keywords, "gi")
+          $regex: RegExp(keywords, "i")
         };
       }
+
+      console.log(query);
 
       DatabaseService.getCourses(query)
         .then(courses => {
@@ -76,7 +78,6 @@ export default {
 
 <style scoped>
 .wrapper {
-  padding: 20px;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 </style>

@@ -18,7 +18,7 @@ export default new Router({
     {
       path: "/course/add",
       name: "add-course",
-      component: require("@/pages/AddCourse").default
+      component: require("@/pages/BrowseCourses").default
     },
 
     {
