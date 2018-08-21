@@ -6,6 +6,15 @@
       <div style="padding: 10px">
         import database
       </div>
+      <div style="padding: 10px">
+        <router-link to="/course/add">
+          Add Course
+        </router-link>
+      </div><div style="padding: 10px">
+        <router-link to="/category/add">
+          Add Category
+        </router-link>
+      </div>
     </div>
 </template>
 

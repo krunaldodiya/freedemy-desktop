@@ -1,20 +1,33 @@
 <template>
   <div class="wrapper">
-    <div style="padding: 10px" v-if="loading">Please wait, loading...</div>
-    <div class="columns is-multiline is-12" style="margin: 0px; list-style: none;" v-if="courses.length">
-      <div class="column is-2" v-for="(course, index) in courses" :key="index" v-if="!loading">
-        <div style="border: 1px solid #ccc; margin: 1px">
-          <div>
-            <div style="padding: 5px">
-              <img :src="course.image_480x270" :alt="course.title">
-            </div>
-            <div style="padding: 0px 10px">
-              <div style="margin-top: 5px; font-size: 12px; color: #202020; font-weight: bold; text-transform: uppercase; height: 70px" v-text="course.title"></div>
+    <div class="columns">
+      <div class="column is-2">
+        <div style="padding: 10px">
+          Categories
+        </div>
+      </div>
+      <div class="column is-10">
+        <div style="padding: 10px" v-if="loading">Please wait, loading...</div>
+
+        <div class="columns is-multiline is-12" style="margin: 0px; padding: 10px; list-style: none;" v-if="courses.length">
+          <div class="column is-2" v-for="(course, index) in courses" :key="index" v-if="!loading" style="padding: 0px">
+            <div style="border: 1px solid #ccc; margin: 1px">
+              <div>
+                <div style="padding: 5px">
+                  <img :src="course.image_480x270" :alt="course.title">
+                </div>
+                <div style="padding: 0px 10px">
+                  <div style="margin-top: 5px; font-size: 12px; color: #202020; font-weight: bold; text-transform: uppercase; height: 80px" v-text="course.title"></div>
+                </div>
+                <div style="padding: 0px 10px">
+                  <div style="margin-top: 5px; font-size: 12px; color: indigo; height: 60px">https://www.udemy.com{{course.url}}</div>
+                </div>
+              </div>
+              <button type="button" class="button is-primary is-small is-fullwidth" :class="{'is-loading': loading}" :disabled="loading" @click="addCourse(course)">
+                Add Course
+              </button>
             </div>
           </div>
-          <button type="button" class="button is-primary is-small is-fullwidth" :class="{'is-loading': loading}" :disabled="loading" @click="addCourse(course)">
-            Add Course
-          </button>
         </div>
       </div>
     </div>

@@ -1,0 +1,55 @@
+{
+  "categories": [
+    {
+      "id": 1,
+      "title": "Development"
+    },
+    {
+      "id": 2,
+      "title": "Business"
+    }
+  ],
+  "subcategories": [
+    {
+      "id": 3,
+      "category_id": 1,
+      "title": "Web Development"
+    },
+    {
+      "id": 4,
+      "category_id": 1,
+      "title": "Mobile Apps"
+    },
+    {
+      "id": 5,
+      "category_id": 2,
+      "title": "Finance"
+    }
+  ],
+  "topics": [
+    {
+      "id": 6,
+      "category_id": 1,
+      "subcategory_id": 4,
+      "title": "iOS Development"
+    },
+    {
+      "id": 7,
+      "category_id": 1,
+      "subcategory_id": 3,
+      "title": "Angular"
+    },
+    {
+      "id": 8,
+      "category_id": 1,
+      "subcategory_id": 4,
+      "title": "Android Development"
+    },
+    {
+      "id": 9,
+      "category_id": 1,
+      "subcategory_id": 3,
+      "title": "JavaScript"
+    }
+  ]
+}

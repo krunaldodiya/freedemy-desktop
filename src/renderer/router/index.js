@@ -16,9 +16,15 @@ export default new Router({
     },
 
     {
+      path: "/course/browse",
+      name: "browse-course",
+      component: require("@/pages/BrowseCourses").default
+    },
+
+    {
       path: "/course/add",
       name: "add-course",
-      component: require("@/pages/BrowseCourses").default
+      component: require("@/pages/AddCourse").default
     },
 
     {
@@ -34,6 +40,12 @@ export default new Router({
       beforeEnter(to, from, next) {
         return checkStorage(to, from, next);
       }
+    },
+
+    {
+      path: "/category/add",
+      name: "add-category",
+      component: require("@/pages/AddCategory").default
     },
 
     {

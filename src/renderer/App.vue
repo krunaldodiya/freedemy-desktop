@@ -9,8 +9,8 @@
       </div>
        <div class="column is-3">
          <div class="field is-grouped is-pulled-right">
-          <p class="control" v-if="$route.name !== 'add-course'">
-            <router-link class="button is-default" to="/course/add">
+          <p class="control" v-if="$route.name !== 'browse-course'">
+            <router-link class="button is-default" to="/course/browse">
               Browse Courses  
             </router-link>
           </p>

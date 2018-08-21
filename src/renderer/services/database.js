@@ -80,9 +80,15 @@ export default class Database {
     });
   }
 
-  validation(data) {
+  validation(data, rules) {
     return Object.keys(data)
-      .filter(key => !data[key].length)
+      .filter(key => {
+        if (rules.hasOwnProperty(key)) {
+          return !data[key].toString().length;
+        }
+
+        return false;
+      })
       .map(key => {
         return {
           field: key,
@@ -95,12 +101,25 @@ export default class Database {
     const udemy_url = "https://www.udemy.com";
     const data = {
       ...credentials,
+      course_id: parseInt(credentials.course_id),
       url: udemy_url + credentials.url,
       table: "courses"
     };
+
     const selector = { table: data.table, course_id: data.course_id };
 
     return new Promise((resolve, reject) => {
+      const isInvalid = this.validation(credentials, {
+        course_id: "required",
+        title: "required",
+        image: "required",
+        url: "required"
+      });
+
+      if (isInvalid.length) {
+        return reject(isInvalid);
+      }
+
       db.update(selector, data, { upsert: true }, (err, numRows) => {
         if (err) {
           return reject(err);

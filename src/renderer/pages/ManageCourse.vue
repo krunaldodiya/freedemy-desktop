@@ -51,7 +51,7 @@
 </template>
 
 <script>
-const { dialog } = require("electron").remote;
+const { dialog, getCurrentWindow } = require("electron").remote;
 import ValidationErrors from "@/libs/validation-errors";
 import Database from "@/services/database";
 const DatabaseService = new Database();
@@ -115,6 +115,14 @@ export default {
     },
 
     deleteCourse(course_id) {
+      const choice = dialog.showMessageBox(getCurrentWindow(), {
+        type: "question",
+        buttons: ["Yes", "No"],
+        title: "Confirm",
+        message: "Are you sure you want to delete?"
+      });
+
+      if (choice === 1) return;
       this.deleting_course = true;
 
       DatabaseService.deleteCourse(course_id)
@@ -138,7 +146,7 @@ export default {
       DatabaseService.addVolumeToCourse(course_id, volume_path)
         .then(data => {
           this.adding_volume = false;
-          return this.$router.push(`/course/detail?course_id=${course_id}`);
+          return this.$router.push(`/course/detail/${course_id}`);
         })
         .catch(e => {
           this.adding_volume = false;

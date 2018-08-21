@@ -47,7 +47,7 @@ export default {
       if (this.type == "course_id" && isNaN(this.keywords)) return;
 
       this.$router.push({
-        name: this.$route.name === "add-course" ? "add-course" : "home",
+        name: "browse-course",
         query: {
           ...this.$route.query,
           keywords: this.keywords,
