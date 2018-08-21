@@ -5,12 +5,15 @@ import axios from "axios";
 
 // font-awesome
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { library } from "@fortawesome/fontawesome-svg-core";
 Vue.component("font-awesome-icon", FontAwesomeIcon);
 
-// library
-import { library } from "@fortawesome/fontawesome-svg-core";
+// icons
 import { faCog } from "@fortawesome/free-solid-svg-icons";
 library.add(faCog);
+
+import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
+library.add(faExternalLinkAlt);
 
 import App from "./App";
 

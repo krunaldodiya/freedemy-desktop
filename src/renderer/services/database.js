@@ -129,4 +129,28 @@ export default class Database {
       });
     });
   }
+
+  saveTopic(course, category, subcategory, topic) {
+    return new Promise((resolve, reject) => {
+      db.update(
+        { _id: course._id },
+        {
+          $set: {
+            keywords: `${course.title} ${topic.title}`,
+            category,
+            subcategory,
+            topic
+          }
+        },
+        {},
+        (err, numReplaced) => {
+          if (err) {
+            return reject(err);
+          }
+
+          return resolve(numReplaced);
+        }
+      );
+    });
+  }
 }

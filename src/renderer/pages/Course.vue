@@ -1,5 +1,5 @@
 <template>
-  <div class="columns is-12" style="padding: 20px; background: purple" v-if="!loading">      
+  <div class="columns is-12" style="padding: 20px; background: #444" v-if="!loading">      
     <div class="column is-3" style="overflow: auto; max-height: 730px;">
       <ul style="margin: 0px; list-style: none;">      
         <li v-for="(section, index) in tree" :key="index">
@@ -18,8 +18,9 @@
       <div style="margin: 5px 0px 35px 0px">
         <h1 class="title" style="color: white; font-size: 22px" v-text="course.title"></h1>
       </div>
-
-      <Player v-if="load_video" :file="file" :poster="course.image"/>
+      <div class="player-wrapper">
+        <Player v-if="load_video" :file="file" :poster="course.image"/>
+      </div>
     </div>
   </div>
 </template>
@@ -162,6 +163,12 @@ export default {
 <style scoped>
 .wrapper {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.player-wrapper {
+  background: #444;
+  width: 100%;
+  height: auto;
 }
 
 li > ul > li {

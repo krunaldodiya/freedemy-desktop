@@ -1,48 +1,75 @@
 <template>
-  <div class="columns">
-    <div class="column is-6" style="margin: 10px 0">
-      <div class="form">
-        <div class="field">
-          <div class="control">
-              <img :src="course.image" :alt="course.title">
+  <div class="wrapper">
+    <div v-if="loading" style="padding: 10px">loading...</div>
+    <div class="columns" v-if="!loading">
+      <div class="column is-4" style="margin: 10px 0;">
+        <div class="form">
+          <div class="field">
+            <div class="control">
+                <img :src="course.image" :alt="course.title">
+            </div>
+          </div>
+          <div class="field">
+            <div class="control">
+              <div v-text="course.title" style="font-size: 22px; max-width: 480px"></div>
+            </div>
+          </div>
+          <div class="field">
+            <div class="control">
+              <span @click="openUrl(course)" v-text="course.url" style="font-size: 14px; color: indigo; cursor: pointer"></span>
+            </div>
           </div>
         </div>
-        <div class="field">
-          <div class="control">
-            <div v-text="course.title" style="font-size: 22px"></div>
-          </div>
-        </div>
-        <div class="field">
-          <div class="control">
-            <span v-text="course.url" style="font-size: 14px; color: indigo; cursor: pointer"></span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="column is-6" style="margin: 20px 0">
-      <div class="field is-grouped">
-        <p class="control">
-          <a class="button is-link" @click.prevent="addVolume" :class="{'is-loading': adding_volume}" :disabled="adding_volume">
-            <span v-if="volume.volume_path.length">Change Volume</span>    
-            <span v-if="!volume.volume_path.length">Add Volume</span>    
-          </a>
-        </p>
-        <p class="control">
-          <a class="button is-danger" @click.prevent="deleteCourse($route.query.course_id)" :class="{'is-loading': deleting_course}" :disabled="deleting_course">
-            Delete Course
-          </a>
-        </p>
       </div>
 
-      <div v-if="$route.query.error == 'no_volume' && !adding_volume" style="color: red">
-        Please, add a volume.
+      <div class="column is-4" style="margin: 20px 0;">
+        <div style="margin-bottom: 5px">
+          <select class="select" name="" id="" style="min-width: 200px" v-model="selected_category">
+            <option value="">select a category</option>
+            <option v-for="(category, index) in categories" :key="index" :value="category" v-text="category.title"></option>
+          </select>
+        </div>
+        <div style="margin-bottom: 5px">
+          <select class="select" name="" id="" style="min-width: 200px" v-model="selected_subcategory">
+            <option value="">select a subcategory</option>
+            <option v-for="(subcategory, index) in subcategories" :key="index" :value="subcategory" v-text="subcategory.title"></option>
+          </select>
+        </div>
+        <div style="margin-bottom: 5px">
+          <select class="select" name="" id="" style="min-width: 200px" v-model="selected_topic">
+            <option value="">select a topic</option>
+            <option v-for="(topic, index) in topics" :key="index" :value="topic" v-text="topic.title"></option>
+          </select>
+        </div>
+        <button @click="saveTopic">
+          Save
+        </button>
       </div>
-      
-      <div style="border: 1px solid #ccc; padding: 5px" v-if="volume.volume_path.length">
-        <div v-for="(volume, index) in volume.volume_path.split('/')" :key="index">
-          <div v-if="index > 0" style="font-size: 12px; font-weight: 400; font-family: tahoma; padding: 2px">
-            > {{ volume }}
+
+      <div class="column is-4" style="margin: 20px 0">
+        <div class="field is-grouped">
+          <p class="control">
+            <a class="button is-link" @click.prevent="addVolume" :class="{'is-loading': adding_volume}" :disabled="adding_volume">
+              <span v-if="volume.volume_path.length">Change Volume</span>    
+              <span v-if="!volume.volume_path.length">Add Volume</span>    
+            </a>
+          </p>
+          <p class="control">
+            <a class="button is-danger" @click.prevent="deleteCourse($route.query.course_id)" :class="{'is-loading': deleting_course}" :disabled="deleting_course">
+              Delete Course
+            </a>
+          </p>
+        </div>
+
+        <div v-if="$route.query.error == 'no_volume' && !adding_volume" style="color: red">
+          Please, add a volume.
+        </div>
+        
+        <div style="border: 1px solid #ccc; padding: 5px" v-if="volume.volume_path.length">
+          <div v-for="(volume, index) in volume.volume_path.split('/')" :key="index">
+            <div v-if="index > 0" style="font-size: 12px; font-weight: 400; font-family: tahoma; padding: 2px">
+              > {{ volume }}
+            </div>
           </div>
         </div>
       </div>
@@ -51,14 +78,41 @@
 </template>
 
 <script>
-const { dialog, getCurrentWindow } = require("electron").remote;
+const { dialog, getCurrentWindow, shell } = require("electron").remote;
 import ValidationErrors from "@/libs/validation-errors";
 import Database from "@/services/database";
 const DatabaseService = new Database();
+const tree = require("@/assets/json/categories.json");
 
 export default {
   created() {
     this.loadCourse();
+  },
+
+  computed: {
+    categories() {
+      return this.tree.categories;
+    },
+
+    subcategories() {
+      if (this.selected_category) {
+        return this.tree.subcategories.filter(
+          subcategory => subcategory.category_id == this.selected_category.id
+        );
+      }
+
+      return [];
+    },
+
+    topics() {
+      if (this.selected_subcategory) {
+        return this.tree.topics.filter(
+          topic => topic.subcategory_id == this.selected_subcategory.id
+        );
+      }
+
+      return [];
+    }
   },
 
   data() {
@@ -76,6 +130,10 @@ export default {
         table: "volumes",
         volume_path: ""
       },
+      tree,
+      selected_category: "",
+      selected_subcategory: "",
+      selected_topic: "",
       errors: new ValidationErrors()
     };
   },
@@ -87,6 +145,37 @@ export default {
   },
 
   methods: {
+    openUrl(course) {
+      shell.openExternal(course.url);
+    },
+
+    saveTopic() {
+      if (
+        this.selected_category &&
+        this.selected_subcategory &&
+        this.selected_topic
+      ) {
+        return DatabaseService.saveTopic(
+          this.course,
+          this.selected_category,
+          this.selected_subcategory,
+          this.selected_topic
+        )
+          .then(() => {
+            dialog.showMessageBox(getCurrentWindow(), {
+              type: "info",
+              message: "Topic has been updated successfully."
+            });
+          })
+          .catch(e => console.log(e));
+      }
+
+      return dialog.showMessageBox(getCurrentWindow(), {
+        type: "error",
+        message: "Please, choose a valid topic."
+      });
+    },
+
     loadCourse() {
       const course_id = this.$route.query.course_id;
 
@@ -96,6 +185,9 @@ export default {
         DatabaseService.getCourseByCourseId(course_id)
           .then(course => {
             this.course = course;
+            this.selected_category = course.category || "";
+            this.selected_subcategory = course.subcategory || "";
+            this.selected_topic = course.topic || "";
 
             DatabaseService.getVolumeByCourseId(course_id)
               .then(volume => {
@@ -137,6 +229,13 @@ export default {
     },
 
     addVolume() {
+      if (!this.selected_topic) {
+        return dialog.showMessageBox(getCurrentWindow(), {
+          type: "error",
+          message: "Please, choose a topic first."
+        });
+      }
+
       this.adding_volume = true;
 
       const course_id = this.course.course_id;
