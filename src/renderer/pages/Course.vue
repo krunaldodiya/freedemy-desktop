@@ -1,7 +1,7 @@
 <template>
   <div class="columns is-12" style="padding: 20px; background: #444" v-if="!loading">      
     <div class="column is-3" style="overflow: auto; max-height: 730px;">
-      <ul style="margin: 0px; list-style: none;">      
+      <ul style="margin: 0px; list-style: none;">
         <li v-for="(section, index) in tree" :key="index">
           <div style="background: black; color: white; padding: 10px" v-text="section.section"></div>
   
@@ -15,8 +15,17 @@
     </div>
 
     <div class="column is-9" style="padding: 20px">
-      <div style="margin: 5px 0px 35px 0px">
-        <h1 class="title" style="color: white; font-size: 22px" v-text="course.title"></h1>
+      <div style="margin: 5px 10px 10px 5px">
+        <div class="level" style="margin: 0px; padding: 0px">
+          <div class="level-left">
+            <h1 class="title" style="color: white; font-size: 22px" v-text="course.title"></h1>            
+          </div>
+          <div class="level-right">
+            <router-link :to="`/course/manage?course_id=${course.course_id}`" style="padding-left: 5px; color: white">
+              <font-awesome-icon icon="cog" />
+            </router-link>
+          </div>
+        </div>
       </div>
       <div class="player-wrapper">
         <Player v-if="load_video" :file="file" :poster="course.image"/>
@@ -168,7 +177,6 @@ export default {
 .player-wrapper {
   background: #444;
   width: 100%;
-  height: auto;
 }
 
 li > ul > li {

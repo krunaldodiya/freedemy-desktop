@@ -7,8 +7,9 @@
             <input type="text" placeholder="Filter Courses" class="input" v-model="filter">
           </div>
 
-          <div style="padding: 10px">
-            <div v-for="(topic, index) in topics" :key="index">
+          <div style="padding: 5px; margin-top: 5px; font-size: 10px; text-transform: uppercase; cursor: pointer" v-if="filter" @click="filter = ''">clear filters</div>
+          <div style="padding: 10px; max-height: 650px; overflow: auto; border: 1px solid #e2dbdb; margin-top: 5px; padding: 0px">
+            <div v-for="(topic, index) in topics" :key="index" style="padding: 5px">
               <div v-text="topic" @click="filter = topic" style="color: blue; cursor: pointer"></div>
             </div>
           </div>
@@ -22,9 +23,16 @@
         <div class="columns is-multiline is-12" style="margin: 0px; padding: 10px; list-style: none" v-if="courses.length">
           <div class="column is-2" v-for="(course, index) in courses" :key="index" style="padding: 0px">
             <div style="border: 1px solid #e2dbdb; margin: 3px; padding-top: 5px; background: whitesmoke; box-shadow: 1px 1px #e2dbdb;">
-              <router-link :to="`/course/manage?course_id=${course.course_id}`" style="padding-left: 5px; color: blue">
-                <font-awesome-icon icon="cog" />
-              </router-link>
+              <div class="level" style="margin: 0px">
+                <div class="level-left">
+                <router-link :to="`/course/manage?course_id=${course.course_id}`" style="padding-left: 5px; color: blue">
+                  <font-awesome-icon icon="cog" />
+                </router-link>
+                </div>
+                <div class="level-right">
+                  <div v-text="'#'+course.course_id" style="margin-right: 10px; font-size: 12px"></div>
+                </div>
+              </div>
               <router-link style="color: black" :to="`/course/detail/${course.course_id}`">
                 <div>
                   <div style="padding: 5px">

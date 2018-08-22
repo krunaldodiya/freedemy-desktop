@@ -1,7 +1,7 @@
 <template>
   <div class="round">
     <div @click="goToHome()" class="logo">
-      <span v-text="($route.name == 'show-course-detail') ? 'Go Back': 'Udemy - Offline'"></span>
+      <span v-text="($route.name == 'show-course-detail') ? 'Go Back': 'STREAM.LY'"></span>
     </div>
   </div>
 </template>

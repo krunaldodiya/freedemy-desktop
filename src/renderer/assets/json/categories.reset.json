@@ -651,6 +651,90 @@
       "title": "GraphQL",
       "category_id": "802824508001",
       "subcategory_id": "751015614422"
+    },
+    {
+      "id": "077897003647",
+      "title": "MongoDB",
+      "category_id": "802824508001",
+      "subcategory_id": "751015614422"
+    },
+    {
+      "id": "600972170171",
+      "title": "Startup",
+      "category_id": "360842609737",
+      "subcategory_id": "436283064578"
+    },
+    {
+      "id": "875130099134",
+      "title": "Cyber Security",
+      "category_id": "837012456139",
+      "subcategory_id": "188475234416"
+    },
+    {
+      "id": "800147662819",
+      "title": "Investing",
+      "category_id": "360842609737",
+      "subcategory_id": "179704150724"
+    },
+    {
+      "id": "655746678291",
+      "title": "Stock Trading",
+      "category_id": "360842609737",
+      "subcategory_id": "179704150724"
+    },
+    {
+      "id": "939298737027",
+      "title": "Passive Income",
+      "category_id": "234013010798",
+      "subcategory_id": "952202514538"
+    },
+    {
+      "id": "547849862896",
+      "title": "Personal Productivity",
+      "category_id": "234013010798",
+      "subcategory_id": "634266571290"
+    },
+    {
+      "id": "998550211301",
+      "title": "Management Skills",
+      "category_id": "234013010798",
+      "subcategory_id": "013803391971"
+    },
+    {
+      "id": "782380256952",
+      "title": "Confidence",
+      "category_id": "234013010798",
+      "subcategory_id": "438934607612"
+    },
+    {
+      "id": "760910340491",
+      "title": "Data Science",
+      "category_id": "802824508001",
+      "subcategory_id": "016018232865"
+    },
+    {
+      "id": "175088486687",
+      "title": "Kubernetes",
+      "category_id": "802824508001",
+      "subcategory_id": "611673484815"
+    },
+    {
+      "id": "871461434112",
+      "title": "CSS",
+      "category_id": "802824508001",
+      "subcategory_id": "309598180017"
+    },
+    {
+      "id": "574163230660",
+      "title": "Business Fundamentals",
+      "category_id": "360842609737",
+      "subcategory_id": "436283064578"
+    },
+    {
+      "id": "647427527403",
+      "title": "Node JS",
+      "category_id": "802824508001",
+      "subcategory_id": "309598180017"
     }
   ]
 }
