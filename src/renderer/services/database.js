@@ -1,15 +1,25 @@
 import db from "../libs/database";
 
 export default class Database {
-  getCourses(query) {
-    return new Promise((resolve, reject) => {
-      db.find(query, (err, docs) => {
-        if (err) {
-          return reject(err);
-        }
+  getCourses(query, page, limit) {
+    const skip = page * limit;
 
-        return resolve(docs);
-      });
+    return new Promise((resolve, reject) => {
+      db.find(query)
+        .sort({ title: 1 })
+        .skip(skip)
+        .limit(limit)
+        .exec((err, docs) => {
+          if (err) {
+            return reject(err);
+          }
+
+          if (docs.length) {
+            return resolve({ loaded: false, data: docs });
+          }
+
+          return resolve({ loaded: true, data: docs });
+        });
     });
   }
 
@@ -120,7 +130,7 @@ export default class Database {
         return reject(isInvalid);
       }
 
-      db.update(selector, data, { upsert: true }, (err, numRows) => {
+      db.update(selector, { $set: data }, { upsert: true }, (err, numRows) => {
         if (err) {
           return reject(err);
         }

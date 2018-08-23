@@ -5,19 +5,19 @@
     <div class="columns">
       <div class="column" style="border: 1px solid #ccc; margin: 1px">
         <input type="text" placeholder="Add Category" class="input" style="margin: 10px 0px" v-model="credentials.category" @keyup.enter.prevent="addCategory">
-        <div v-for="(category, index) in tree.categories" :key="index">
+        <div v-for="(category, index) in categories_tree.categories" :key="index">
           <div v-text="category.title" :class="{'selected-category': category.id == selected_category.id}" class="category" @click="update_selected_category(category)"></div>
         </div>
       </div>
       <div class="column" style="border: 1px solid #ccc; margin: 1px">
         <input type="text" placeholder="Add Subcategory" class="input" style="margin: 10px 0px" v-model="credentials.subcategory" @keyup.enter.prevent="addSubCategory">
-        <div v-for="(subcategory, index) in tree.subcategories" :key="index" v-if="subcategory.category_id == selected_category.id">
+        <div v-for="(subcategory, index) in categories_tree.subcategories" :key="index" v-if="subcategory.category_id == selected_category.id">
           <div v-text="subcategory.title" :class="{'selected-subcategory': subcategory.id == selected_subcategory.id}" class="subcategory" @click="update_selected_subcategory(subcategory)"></div>
         </div>        
       </div>
       <div class="column" style="border: 1px solid #ccc; margin: 1px">
         <input type="text" placeholder="Add Topic" class="input" style="margin: 10px 0px" v-model="credentials.topic" @keyup.enter.prevent="addTopic">
-        <div v-for="(topic, index) in tree.topics" :key="index" v-if="selected_subcategory && topic.subcategory_id == selected_subcategory.id">
+        <div v-for="(topic, index) in categories_tree.topics" :key="index" v-if="selected_subcategory && topic.subcategory_id == selected_subcategory.id">
           <div :title="topic.id" v-text="topic.title" :class="{'selected-topic': topic.id == selected_topic.id}" class="topic" @click="update_selected_topic(topic)"></div>
         </div>        
       </div>
@@ -26,14 +26,19 @@
 </template>
 
 <script>
+const { app } = require("electron").remote;
 const randomstring = require("randomstring");
 const fs = require("fs");
 const path = require("path");
-const tree = require("@/assets/json/categories.json");
+
+const userData = app.getPath("home");
+const categories_tree = JSON.parse(
+  fs.readFileSync(`${userData}/freedemy/categories.json`)
+);
 
 export default {
   created() {
-    this.update_selected_category(this.tree.categories[0]);
+    this.update_selected_category(this.categories_tree.categories[0]);
   },
 
   data() {
@@ -47,7 +52,7 @@ export default {
         subcategory: null,
         topic: null
       },
-      tree
+      categories_tree
     };
   },
 
@@ -56,8 +61,8 @@ export default {
       this.loading = true;
 
       fs.writeFile(
-        path.join(__dirname, "../assets/json/categories.json"),
-        JSON.stringify(this.tree),
+        `${userData}/freedemy/categories.json`,
+        JSON.stringify(this.categories_tree),
         "utf8",
         error => {
           if (error) {
@@ -77,7 +82,7 @@ export default {
         title: this.credentials.category
       };
 
-      this.tree.categories.push(category);
+      this.categories_tree.categories.push(category);
       this.update_selected_category(category);
       this.credentials.category = null;
     },
@@ -91,7 +96,7 @@ export default {
         category_id: this.selected_category.id
       };
 
-      this.tree.subcategories.push(subcategory);
+      this.categories_tree.subcategories.push(subcategory);
       this.update_selected_subcategory(subcategory);
       this.credentials.subcategory = null;
     },
@@ -106,7 +111,7 @@ export default {
         subcategory_id: this.selected_subcategory.id
       };
 
-      this.tree.topics.push(topic);
+      this.categories_tree.topics.push(topic);
       this.update_selected_topic(topic);
       this.credentials.topic = null;
     },
@@ -115,7 +120,7 @@ export default {
       this.selected_category = category;
 
       const subcategories = this.selected_category
-        ? this.tree.subcategories.filter(
+        ? this.categories_tree.subcategories.filter(
             subcategories =>
               subcategories.category_id == this.selected_category.id
           )
@@ -124,7 +129,7 @@ export default {
       this.selected_subcategory = subcategories[0];
 
       const topics = this.selected_subcategory
-        ? this.tree.topics.filter(
+        ? this.categories_tree.topics.filter(
             topic => topic.subcategory_id == this.selected_subcategory.id
           )
         : [];
@@ -136,7 +141,7 @@ export default {
       this.selected_subcategory = subcategory;
 
       const topics = this.selected_subcategory
-        ? this.tree.topics.filter(
+        ? this.categories_tree.topics.filter(
             topic => topic.subcategory_id == this.selected_subcategory.id
           )
         : [];

@@ -34,8 +34,22 @@ import Header from "@/components/Header";
 
 const { app } = require("electron").remote;
 
+const fs = require("fs");
+const userData = app.getPath("home");
+const categories_tree = `${userData}/freedemy/categories.json`;
+const categories_reset = require("@/assets/json/categories.json");
+
 export default {
   name: "freedemy",
+
+  created() {
+    if (!fs.existsSync(categories_tree)) {
+      const context = JSON.stringify(categories_reset);
+      fs.writeFile(categories_tree, context, err => {
+        console.log(err);
+      });
+    }
+  },
 
   components: {
     Logo,

@@ -53,19 +53,36 @@
             </div>
           </div>
         </div>
+
+        <div v-if="busy" style="text-align: center; padding: 20px">Please wait, loading...</div>
+        <div v-if="loaded" style="text-align: center; padding: 20px">No more data.</div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+const { app } = require("electron").remote;
+
+const fs = require("fs");
+const path = require("path");
+
 import Database from "@/services/database";
 const DatabaseService = new Database();
-const tree = require("@/assets/json/categories.json");
+
+const userData = app.getPath("home");
+const categories_tree = JSON.parse(
+  fs.readFileSync(`${userData}/freedemy/categories.json`)
+);
 
 export default {
   created() {
+    window.addEventListener("scroll", this.handleScroll);
     this.getCourseList();
+  },
+
+  destroyed() {
+    window.removeEventListener("scroll", this.handleScroll);
   },
 
   watch: {
@@ -80,37 +97,60 @@ export default {
 
   computed: {
     topics() {
-      return [...new Set(this.tree.topics.map(topic => topic.title))];
+      return [
+        ...new Set(this.categories_tree.topics.map(topic => topic.title))
+      ];
     }
   },
 
   data() {
     return {
-      loading: true,
+      busy: false,
+      loading: false,
       courses: [],
       filter: null,
-      tree
+      categories_tree,
+      page: 0,
+      limit: 30,
+      loaded: false
     };
   },
 
   methods: {
-    getCourseList() {
-      const keywords = this.filter;
+    handleScroll(event) {
+      if (this.busy == false && !this.loaded) {
+        const scrollArea = window.innerHeight + window.scrollY + 15;
+        if (scrollArea >= document.body.offsetHeight) {
+          this.getCourseList();
+        }
+      }
+    },
 
+    getCourseList() {
+      this.loading = true;
+      this.busy = true;
+
+      const keywords = this.filter;
       const query = {
         table: "courses"
       };
 
       if (keywords) {
         query["keywords"] = {
-          $regex: RegExp(keywords, "i")
+          $regex: RegExp(keywords, "gi")
         };
       }
 
-      DatabaseService.getCourses(query)
+      DatabaseService.getCourses(query, this.page, this.limit)
         .then(courses => {
-          this.loading = false;
-          this.courses = courses;
+          this.page++;
+
+          setTimeout(() => {
+            this.courses = [...this.courses, ...courses.data];
+            this.loading = false;
+            this.busy = false;
+            this.loaded = courses.loaded;
+          }, 1000);
         })
         .catch(e => {
           this.loading = false;

@@ -78,11 +78,18 @@
 </template>
 
 <script>
-const { dialog, getCurrentWindow, shell } = require("electron").remote;
+const { app, dialog, getCurrentWindow, shell } = require("electron").remote;
+const fs = require("fs");
+const path = require("path");
+
 import ValidationErrors from "@/libs/validation-errors";
 import Database from "@/services/database";
 const DatabaseService = new Database();
-const tree = require("@/assets/json/categories.json");
+
+const userData = app.getPath("home");
+const categories_tree = JSON.parse(
+  fs.readFileSync(`${userData}/freedemy/categories.json`)
+);
 
 export default {
   created() {
@@ -91,12 +98,12 @@ export default {
 
   computed: {
     categories() {
-      return this.tree.categories;
+      return this.categories_tree.categories;
     },
 
     subcategories() {
       if (this.selected_category) {
-        return this.tree.subcategories.filter(
+        return this.categories_tree.subcategories.filter(
           subcategory => subcategory.category_id == this.selected_category.id
         );
       }
@@ -106,7 +113,7 @@ export default {
 
     topics() {
       if (this.selected_subcategory) {
-        return this.tree.topics.filter(
+        return this.categories_tree.topics.filter(
           topic => topic.subcategory_id == this.selected_subcategory.id
         );
       }
@@ -130,7 +137,7 @@ export default {
         table: "volumes",
         volume_path: ""
       },
-      tree,
+      categories_tree,
       selected_category: "",
       selected_subcategory: "",
       selected_topic: "",
