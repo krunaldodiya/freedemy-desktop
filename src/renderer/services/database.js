@@ -5,21 +5,35 @@ export default class Database {
     const skip = page * limit;
 
     return new Promise((resolve, reject) => {
-      db.find(query)
-        .sort({ title: 1 })
-        .skip(skip)
-        .limit(limit)
-        .exec((err, docs) => {
-          if (err) {
-            return reject(err);
-          }
+      db.count(query, (err, count) => {
+        if (query.keywords) {
+          db.find(query, (err, docs) => {
+            if (err) {
+              return reject(err);
+            }
 
-          if (docs.length) {
-            return resolve({ loaded: false, data: docs });
-          }
+            return resolve({
+              data: docs,
+              count
+            });
+          });
+        }
 
-          return resolve({ loaded: true, data: docs });
-        });
+        db.find(query)
+          .sort({ title: 1 })
+          .skip(skip)
+          .limit(limit)
+          .exec((err, docs) => {
+            if (err) {
+              return reject(err);
+            }
+
+            return resolve({
+              data: docs,
+              count
+            });
+          });
+      });
     });
   }
 

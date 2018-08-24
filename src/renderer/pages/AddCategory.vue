@@ -28,16 +28,17 @@
 <script>
 const { app } = require("electron").remote;
 const randomstring = require("randomstring");
+
 const fs = require("fs");
 const path = require("path");
-
 const userData = app.getPath("home");
-const categories_tree = JSON.parse(
-  fs.readFileSync(`${userData}/freedemy/categories.json`)
-);
 
 export default {
   created() {
+    this.categories_tree = JSON.parse(
+      fs.readFileSync(`${userData}/freedemy/categories.json`)
+    );
+
     this.update_selected_category(this.categories_tree.categories[0]);
   },
 
@@ -52,7 +53,7 @@ export default {
         subcategory: null,
         topic: null
       },
-      categories_tree
+      categories_tree: null
     };
   },
 

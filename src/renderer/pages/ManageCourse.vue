@@ -79,20 +79,21 @@
 
 <script>
 const { app, dialog, getCurrentWindow, shell } = require("electron").remote;
+
 const fs = require("fs");
 const path = require("path");
+const userData = app.getPath("home");
 
 import ValidationErrors from "@/libs/validation-errors";
 import Database from "@/services/database";
 const DatabaseService = new Database();
 
-const userData = app.getPath("home");
-const categories_tree = JSON.parse(
-  fs.readFileSync(`${userData}/freedemy/categories.json`)
-);
-
 export default {
   created() {
+    this.categories_tree = JSON.parse(
+      fs.readFileSync(`${userData}/freedemy/categories.json`)
+    );
+
     this.loadCourse();
   },
 
@@ -137,7 +138,7 @@ export default {
         table: "volumes",
         volume_path: ""
       },
-      categories_tree,
+      categories_tree: null,
       selected_category: "",
       selected_subcategory: "",
       selected_topic: "",
