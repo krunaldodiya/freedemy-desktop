@@ -51,6 +51,33 @@ export default class Database {
     });
   }
 
+  renameVolume(course, new_volume_path) {
+    return new Promise((resolve, reject) => {
+      db.update(
+        { course_id: course.course_id, table: "volumes" },
+        {
+          $set: {
+            volume_path: new_volume_path
+          }
+        },
+        { upsert: true },
+        (err, doc) => {
+          if (err) {
+            return reject(err);
+          }
+
+          db.findOne({ table: "volumes", course_id: course.course_id }, (err, doc) => {
+            if (err) {
+              return reject(err);
+            }
+    
+            return resolve(doc);
+          });
+        }
+      );
+    });
+  }
+
   getVolumeByCourseId(course_id) {
     course_id = parseInt(course_id);
 
@@ -157,7 +184,7 @@ export default class Database {
   saveTopic(course, category, subcategory, topic) {
     return new Promise((resolve, reject) => {
       db.update(
-        { _id: course._id },
+        { course_id: course.course_id, table: "courses" },
         {
           $set: {
             keywords: `${course.title} ${topic.title}`,

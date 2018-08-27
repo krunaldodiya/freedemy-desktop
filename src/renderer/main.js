@@ -11,10 +11,11 @@ Vue.component("font-awesome-icon", FontAwesomeIcon);
 // icons
 import { faCog } from "@fortawesome/free-solid-svg-icons";
 library.add(faCog);
-
 import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
 library.add(faExternalLinkAlt);
 
+
+// app
 import App from "./App";
 
 import router from "./router";

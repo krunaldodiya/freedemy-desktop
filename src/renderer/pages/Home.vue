@@ -30,6 +30,9 @@
                   <router-link :to="`/course/manage?course_id=${course.course_id}`" style="padding-left: 5px; color: blue">
                     <font-awesome-icon icon="cog" />
                   </router-link>
+                  <span @click="openUrl(course)" style="padding-left: 15px; color: blue; cursor: pointer">
+                    <font-awesome-icon icon="external-link-alt" />
+                  </span>
                 </div>
                 <div class="level-right">
                   <div v-text="'#'+course.course_id" style="margin-right: 10px; font-size: 12px"></div>
@@ -64,7 +67,7 @@
 </template>
 
 <script>
-const { app } = require("electron").remote;
+const { app, shell } = require("electron").remote;
 
 const fs = require("fs");
 const path = require("path");
@@ -129,6 +132,10 @@ export default {
   },
 
   methods: {
+    openUrl(course) {
+      shell.openExternal(course.url);
+    },
+
     clear_filter() {
       this.page = 0;
       this.filter = "";

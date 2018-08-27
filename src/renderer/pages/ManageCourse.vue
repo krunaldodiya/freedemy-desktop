@@ -11,7 +11,9 @@
           </div>
           <div class="field">
             <div class="control">
-              <div v-text="course.title" style="font-size: 22px; max-width: 480px"></div>
+              <span v-text="course.course_id" style="font-size: 22px; max-width: 480px"></span>
+              <span> - </span>
+              <span v-text="course.title" style="font-size: 22px; max-width: 480px"></span>
             </div>
           </div>
           <div class="field">
@@ -72,6 +74,17 @@
             </div>
           </div>
         </div>
+        <div style="padding: 5px; margin-top: 20px">
+          <div class="level" style="margin: 0px">
+            <div class="level-left">Rename Volume</div>
+            <div class="level-right">
+              <button type="button" @click="renameVolume" :class="{'is-loading': renaming_volume}" :disabled="renaming_volume">Rename</button>
+            </div>
+          </div>
+          <div style="margin-top: 10px">
+            <input class="input" type="text" style="outline: none; box-shadow: none; font-size: 12px; padding: 10px 5px" v-model="course_folder_name">
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -126,6 +139,7 @@ export default {
   data() {
     return {
       loading: false,
+      renaming_volume: false,
       adding_volume: false,
       deleting_course: false,
       course: {
@@ -138,6 +152,7 @@ export default {
         table: "volumes",
         volume_path: ""
       },
+      course_folder_name: null,
       categories_tree: null,
       selected_category: "",
       selected_subcategory: "",
@@ -153,6 +168,38 @@ export default {
   },
 
   methods: {
+    renameVolume() {
+      const course_folder_name = this.course_folder_name;
+      const old_volume_path = this.volume.volume_path;
+
+      const old_volume_path_array = old_volume_path.split("/");
+      old_volume_path_array.pop();
+      old_volume_path_array.push(course_folder_name);
+
+      const new_volume_path = old_volume_path_array.join("/");
+      if (fs.existsSync(new_volume_path)) {
+        return dialog.showMessageBox(getCurrentWindow(), {
+          type: "info",
+          message: "Folder already exists."
+        });
+      }
+
+      this.renaming_volume = true;
+      fs.rename(old_volume_path, new_volume_path, () => {
+        DatabaseService.renameVolume(this.course, new_volume_path)
+          .then(volume => {
+            this.renaming_volume = false;
+            if (volume) {
+              this.volume = volume;
+              this.course_folder_name = volume.volume_path.split("/").pop();
+            }
+          })
+          .catch(e => {
+            this.renaming_volume = false;
+          });
+      });
+    },
+
     openUrl(course) {
       shell.openExternal(course.url);
     },
@@ -202,6 +249,7 @@ export default {
                 this.loading = false;
                 if (volume) {
                   this.volume = volume;
+                  this.course_folder_name = volume.volume_path.split("/").pop();
                 }
               })
               .catch(e => {
