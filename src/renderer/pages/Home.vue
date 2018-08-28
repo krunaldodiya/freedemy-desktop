@@ -24,7 +24,8 @@
 
         <div class="columns is-multiline is-12" style="margin: 0px; padding: 10px; list-style: none" v-if="courses.length">
           <div class="column is-2" v-for="(course, index) in courses" :key="index" style="padding: 0px">
-            <div style="border: 1px solid #e2dbdb; margin: 3px; padding-top: 5px; background: whitesmoke; box-shadow: 1px 1px #e2dbdb;">
+            <span v-text="courseExists(course)"></span>
+            <div style="border: 1px solid #e2dbdb; margin: 3px; padding-top: 5px; background: whitesmoke; box-shadow: 1px 1px #e2dbdb;" :class="{'volume-missing': !courseExists(course)}">
               <div class="level" style="margin: 0px">
                 <div class="level-left">
                   <router-link :to="`/course/manage?course_id=${course.course_id}`" style="padding-left: 5px; color: blue">
@@ -76,6 +77,8 @@ const userData = app.getPath("home");
 import Database from "@/services/database";
 const DatabaseService = new Database();
 
+import { getVolumePath } from "@/libs/helpers";
+
 export default {
   created() {
     this.categories_tree = JSON.parse(
@@ -126,12 +129,19 @@ export default {
       filter: "",
       categories_tree: null,
       page: 0,
-      limit: 30,
+      limit: 300,
       count: null
     };
   },
 
   methods: {
+    courseExists(course) {
+      const volume_path = "/Volumes/SAMSUNG/Media/udemy";
+      const course_folder_name = getVolumePath(course);
+
+      return fs.existsSync(`${volume_path}/${course_folder_name}`);
+    },
+
     openUrl(course) {
       shell.openExternal(course.url);
     },
@@ -189,5 +199,9 @@ export default {
 <style scoped>
 .wrapper {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.volume-missing {
+  border: 1px solid red!important
 }
 </style>

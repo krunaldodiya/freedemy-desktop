@@ -66,13 +66,16 @@ export default class Database {
             return reject(err);
           }
 
-          db.findOne({ table: "volumes", course_id: course.course_id }, (err, doc) => {
-            if (err) {
-              return reject(err);
+          db.findOne(
+            { table: "volumes", course_id: course.course_id },
+            (err, doc) => {
+              if (err) {
+                return reject(err);
+              }
+
+              return resolve(doc);
             }
-    
-            return resolve(doc);
-          });
+          );
         }
       );
     });

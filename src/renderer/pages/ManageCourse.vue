@@ -74,7 +74,7 @@
             </div>
           </div>
         </div>
-        <div style="padding: 5px; margin-top: 20px">
+        <div style="padding: 5px; margin-top: 20px" v-if="volume.volume_path.length">
           <div class="level" style="margin: 0px">
             <div class="level-left">Rename Volume</div>
             <div class="level-right">
@@ -100,6 +100,8 @@ const userData = app.getPath("home");
 import ValidationErrors from "@/libs/validation-errors";
 import Database from "@/services/database";
 const DatabaseService = new Database();
+
+import { getVolumePath } from "@/libs/helpers";
 
 export default {
   created() {
@@ -188,16 +190,22 @@ export default {
       fs.rename(old_volume_path, new_volume_path, () => {
         DatabaseService.renameVolume(this.course, new_volume_path)
           .then(volume => {
-            this.renaming_volume = false;
             if (volume) {
               this.volume = volume;
-              this.course_folder_name = volume.volume_path.split("/").pop();
+              this.updateVolumePath();
             }
+
+            this.renaming_volume = false;
           })
           .catch(e => {
             this.renaming_volume = false;
           });
       });
+    },
+
+    updateVolumePath() {
+      const course_folder_name = getVolumePath(this.course);
+      this.course_folder_name = course_folder_name;
     },
 
     openUrl(course) {
@@ -249,7 +257,7 @@ export default {
                 this.loading = false;
                 if (volume) {
                   this.volume = volume;
-                  this.course_folder_name = volume.volume_path.split("/").pop();
+                  this.updateVolumePath();
                 }
               })
               .catch(e => {
@@ -293,6 +301,7 @@ export default {
       }
 
       this.adding_volume = true;
+      this.renaming_volume = true;
 
       const course_id = this.course.course_id;
       const path = dialog.showOpenDialog({ properties: ["openDirectory"] });
@@ -305,6 +314,7 @@ export default {
         })
         .catch(e => {
           this.adding_volume = false;
+          this.renaming_volume = false;
         });
     }
   }
