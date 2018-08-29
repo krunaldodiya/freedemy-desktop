@@ -76,7 +76,7 @@ const userData = app.getPath("home");
 import Database from "@/services/database";
 const DatabaseService = new Database();
 
-import { getVolumePath, server_url } from "@/libs/helpers";
+import { getVolumePath, storage_url } from "@/libs/helpers";
 
 export default {
   created() {
@@ -143,7 +143,7 @@ export default {
     courseExists(course) {
       const course_folder_name = getVolumePath(course);
 
-      return fs.existsSync(`${server_url}/${course_folder_name}`);
+      return fs.existsSync(`${storage_url}/${course_folder_name}`);
     },
 
     openUrl(course) {

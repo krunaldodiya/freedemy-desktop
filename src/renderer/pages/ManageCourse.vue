@@ -95,7 +95,7 @@ import ValidationErrors from "@/libs/validation-errors";
 import Database from "@/services/database";
 const DatabaseService = new Database();
 
-import { getVolumePath, server_url } from "@/libs/helpers";
+import { getVolumePath, storage_url } from "@/libs/helpers";
 
 export default {
   created() {
@@ -108,7 +108,7 @@ export default {
 
   computed: {
     volume_path() {
-      const course_volume = `${server_url}${this.course.volume_path}`;
+      const course_volume = `${storage_url}/${this.course.volume_path}`;
 
       return course_volume.split("/");
     },
@@ -168,7 +168,7 @@ export default {
   methods: {
     renameVolume() {
       const course_folder_name = getVolumePath(this.course);
-      const old_volume_path = server_url + this.course.volume_path;
+      const old_volume_path = `${storage_url}/${this.course.volume_path}`;
 
       const old_volume_path_array = old_volume_path.split("/");
       old_volume_path_array.pop();
@@ -187,7 +187,7 @@ export default {
         DatabaseService.renameVolume(this.course, course_folder_name)
           .then(volume => {
             if (volume) {
-              this.volume = volume;
+              this.course = volume;
             }
 
             this.renaming_volume = false;
@@ -277,7 +277,7 @@ export default {
       const course_id = this.course.course_id;
       const path = dialog.showOpenDialog({
         properties: ["openDirectory"],
-        defaultPath: server_url
+        defaultPath: storage_url
       });
 
       if (!path) {
@@ -288,7 +288,7 @@ export default {
 
       const volume_path = path[0];
 
-      if (!volume_path.includes(server_url)) {
+      if (!volume_path.includes(storage_url)) {
         this.adding_volume = false;
 
         return dialog.showMessageBox(getCurrentWindow(), {
@@ -297,7 +297,8 @@ export default {
         });
       }
 
-      const chunk = volume_path.split(server_url);
+      const chunk = volume_path.split(storage_url);
+      const chunk_url = chunk[1].split("/")[1];
 
       if (chunk.length != 2) {
         this.adding_volume = false;
@@ -308,7 +309,7 @@ export default {
         });
       }
 
-      DatabaseService.updateVolumePath(course_id, chunk[1])
+      DatabaseService.updateVolumePath(course_id, chunk_url)
         .then(data => {
           this.adding_volume = false;
           return this.$router.push(`/course/detail/${course_id}`);

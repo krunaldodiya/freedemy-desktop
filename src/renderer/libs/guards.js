@@ -1,5 +1,5 @@
 import db from "../libs/database";
-import { server_url } from "./helpers";
+import { storage_url } from "./helpers";
 const fs = require("fs");
 
 const checkStorage = (to, from, next) => {
@@ -7,7 +7,7 @@ const checkStorage = (to, from, next) => {
 
   db.findOne({ table: "courses", course_id }, (err, doc) => {
     if (doc) {
-      const course_directory = server_url + doc.volume_path;
+      const course_directory = `${storage_url}/${doc.volume_path}`;
       const isDirectory = fs.lstatSync(course_directory).isDirectory();
       if (isDirectory) {
         next();

@@ -43,7 +43,7 @@ const fs = require("fs");
 const path = require("path");
 const extensions = [".mp4", ".m4v", ".html", ".txt", ".pdf"];
 
-import { getVolumePath, server_url } from "@/libs/helpers";
+import { getVolumePath, storage_url } from "@/libs/helpers";
 
 export default {
   components: {
@@ -84,7 +84,7 @@ export default {
 
     file() {
       const file_path = path.join(
-        server_url,
+        storage_url,
         this.course.volume_path,
         this.selected_section,
         this.selected_lecture
@@ -97,7 +97,7 @@ export default {
         return [];
       }
 
-      const course_directory_path = server_url + this.course.volume_path;
+      const course_directory_path = `${storage_url}/${this.course.volume_path}`;
 
       const tree = [];
 

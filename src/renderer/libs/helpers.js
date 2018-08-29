@@ -4,4 +4,5 @@ export const getVolumePath = course => {
   return course.course_id + " - " + data[index];
 };
 
-export const server_url = "/Volumes/SAMSUNG/Media/udemy/";
+export const storage_url = "/Volumes/SAMSUNG/Media/udemy";
+export const file_url = "http://192.168.2.200:8080";
