@@ -43,6 +43,8 @@ const fs = require("fs");
 const path = require("path");
 const extensions = [".mp4", ".m4v", ".html", ".txt", ".pdf"];
 
+import { getVolumePath, server_url } from "@/libs/helpers";
+
 export default {
   components: {
     Player
@@ -56,17 +58,8 @@ export default {
 
     DatabaseService.getCourseByCourseId(course_id)
       .then(course => {
+        this.loading = false;
         this.course = course;
-
-        DatabaseService.getVolumeByCourseId(course_id)
-          .then(volume => {
-            this.loading = false;
-            this.volume = volume;
-          })
-          .catch(e => {
-            this.loading = false;
-            console.log(e);
-          });
       })
       .catch(e => {
         this.loading = false;
@@ -91,7 +84,8 @@ export default {
 
     file() {
       const file_path = path.join(
-        this.volume.volume_path,
+        server_url,
+        this.course.volume_path,
         this.selected_section,
         this.selected_lecture
       );
@@ -103,7 +97,8 @@ export default {
         return [];
       }
 
-      const course_directory_path = this.volume.volume_path;
+      const course_directory_path = server_url + this.course.volume_path;
+
       const tree = [];
 
       fs
@@ -162,8 +157,7 @@ export default {
     return {
       loading: false,
       load_video: false,
-      course: null,
-      volume: null
+      course: null
     };
   }
 };

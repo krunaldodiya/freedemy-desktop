@@ -4,15 +4,15 @@
       <div class="column is-2" style="padding: 0px">
         <div class="field" style="margin-top: 20px; margin-left: 20px">
           <div class="control">
-            <input type="text" placeholder="Filter Courses" class="input" v-model="filter">
+            <input type="text" placeholder="Filter Courses" class="input" v-model="filter_keywords">
           </div>
 
-          <div style="padding: 5px; margin-top: 5px; font-size: 10px; text-transform: uppercase; cursor: pointer" v-if="filter" @click="clear_filter">clear filters</div>
+          <div style="padding: 5px; margin-top: 5px; font-size: 10px; text-transform: uppercase; cursor: pointer" v-if="filter_topic" @click="clear_filter('filter_topic')">clear filters</div>
           <div style="max-height: 650px; overflow: auto; border: 1px solid #e2dbdb; margin-top: 5px; padding: 0px">
             <div v-for="(tree, index) in topics" :key="index" v-if="tree.topics.length">
               <div v-text="tree.category.title" style="cursor: pointer; background: #e2dbdb; color: black; padding: 5px"></div>
-              <div v-for="(topic, index) in tree.topics" :key="index" style="padding: 5px">
-                <div v-text="topic.title" @click="filter = topic.title" style="color: blue; cursor: pointer; padding-left: 5px"></div>
+              <div v-for="(topic, index) in tree.topics" :key="index" style="padding: 5px" :class="{'selected-topic': filter_topic && filter_topic.id == topic.id}">
+                <div v-text="topic.title" @click="filter_topic = topic" style="color: blue; cursor: pointer; padding-left: 5px"></div>
               </div>
             </div>
           </div>
@@ -20,18 +20,17 @@
       </div>
       <div class="column is-10">
         <div style="padding: 10px" v-if="!courses.length && !loading">No course added yet.</div>
-        <div v-if="courses.length" style="padding: 10px">{{ courses.length }} of {{ count }} courses available.</div>
+        <div v-if="courses.length" style="padding: 10px">{{ courses.length }} courses available.</div>
 
         <div class="columns is-multiline is-12" style="margin: 0px; padding: 10px; list-style: none" v-if="courses.length">
           <div class="column is-2" v-for="(course, index) in courses" :key="index" style="padding: 0px">
-            <span v-text="courseExists(course)"></span>
             <div style="border: 1px solid #e2dbdb; margin: 3px; padding-top: 5px; background: whitesmoke; box-shadow: 1px 1px #e2dbdb;" :class="{'volume-missing': !courseExists(course)}">
               <div class="level" style="margin: 0px">
                 <div class="level-left">
-                  <router-link :to="`/course/manage?course_id=${course.course_id}`" style="padding-left: 5px; color: blue">
+                  <router-link :to="`/course/manage?course_id=${course.course_id}`" style="padding-left: 10px; color: blue">
                     <font-awesome-icon icon="cog" />
                   </router-link>
-                  <span @click="openUrl(course)" style="padding-left: 15px; color: blue; cursor: pointer">
+                  <span @click="openUrl(course)" style="padding-left: 10px; color: blue; cursor: pointer">
                     <font-awesome-icon icon="external-link-alt" />
                   </span>
                 </div>
@@ -77,7 +76,7 @@ const userData = app.getPath("home");
 import Database from "@/services/database";
 const DatabaseService = new Database();
 
-import { getVolumePath } from "@/libs/helpers";
+import { getVolumePath, server_url } from "@/libs/helpers";
 
 export default {
   created() {
@@ -98,7 +97,12 @@ export default {
       this.getCourseList();
     },
 
-    filter() {
+    filter_topic() {
+      this.courses = [];
+      this.getCourseList();
+    },
+
+    filter_keywords() {
       this.courses = [];
       this.getCourseList();
     }
@@ -126,7 +130,8 @@ export default {
       busy: false,
       loading: false,
       courses: [],
-      filter: "",
+      filter_topic: null,
+      filter_keywords: null,
       categories_tree: null,
       page: 0,
       limit: 300,
@@ -136,19 +141,20 @@ export default {
 
   methods: {
     courseExists(course) {
-      const volume_path = "/Volumes/SAMSUNG/Media/udemy";
       const course_folder_name = getVolumePath(course);
 
-      return fs.existsSync(`${volume_path}/${course_folder_name}`);
+      return fs.existsSync(`${server_url}/${course_folder_name}`);
     },
 
     openUrl(course) {
       shell.openExternal(course.url);
     },
 
-    clear_filter() {
+    clear_filter(type) {
       this.page = 0;
-      this.filter = "";
+      type == "filter_topic"
+        ? (this.filter_topic = "")
+        : (this.filter_keywords = "");
     },
 
     handleScroll(event) {
@@ -164,14 +170,29 @@ export default {
       this.loading = true;
       this.busy = true;
 
-      const keywords = this.filter;
-      const query = {
-        table: "courses"
-      };
+      const keywords = this.filter_keywords;
+      const topic = this.filter_topic;
+      let query = {};
 
       if (keywords) {
-        query["keywords"] = {
-          $regex: RegExp(keywords, "i")
+        query = {
+          filter: true,
+          data: {
+            table: "courses",
+            keywords: {
+              $regex: RegExp(keywords, "i")
+            }
+          }
+        };
+      }
+
+      if (topic) {
+        query = {
+          filter: true,
+          data: {
+            table: "courses",
+            "topic.title": topic.title
+          }
         };
       }
 
@@ -202,6 +223,10 @@ export default {
 }
 
 .volume-missing {
-  border: 1px solid red!important
+  border: 1px solid red !important;
+}
+
+.selected-topic {
+  background: #d9e4e4;
 }
 </style>

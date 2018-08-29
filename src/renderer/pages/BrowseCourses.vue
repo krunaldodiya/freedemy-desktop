@@ -85,7 +85,8 @@ export default {
         course_id: udemy_course.id,
         image: udemy_course.image_480x270,
         title: udemy_course.title,
-        url: udemy_course.url
+        url: udemy_course.url,
+        volume_path: null
       };
 
       DatabaseService.addCourse(course)

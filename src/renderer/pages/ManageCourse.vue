@@ -48,17 +48,22 @@
         </button>
       </div>
 
-      <div class="column is-4" style="margin: 20px 0">
+      <div class="column is-4" style="margin: 20px 0" v-if="this.selected_topic">
         <div class="field is-grouped">
           <p class="control">
             <a class="button is-link" @click.prevent="addVolume" :class="{'is-loading': adding_volume}" :disabled="adding_volume">
-              <span v-if="volume.volume_path.length">Change Volume</span>    
-              <span v-if="!volume.volume_path.length">Add Volume</span>    
+              <span v-if="course.volume_path">Change Volume</span>    
+              <span v-if="!course.volume_path">Add Volume</span>    
             </a>
           </p>
           <p class="control">
             <a class="button is-danger" @click.prevent="deleteCourse($route.query.course_id)" :class="{'is-loading': deleting_course}" :disabled="deleting_course">
               Delete Course
+            </a>
+          </p>
+          <p class="control">
+            <a class="button is-default" @click.prevent="renameVolume()" :class="{'is-loading': renaming_volume}" :disabled="renaming_volume" v-if="course.volume_path">
+              Rename Volume
             </a>
           </p>
         </div>
@@ -67,22 +72,11 @@
           Please, add a volume.
         </div>
         
-        <div style="border: 1px solid #ccc; padding: 5px" v-if="volume.volume_path.length">
-          <div v-for="(volume, index) in volume.volume_path.split('/')" :key="index">
+        <div style="border: 1px solid #ccc; padding: 5px" v-if="course.volume_path">
+          <div v-for="(volume, index) in volume_path" :key="index">
             <div v-if="index > 0" style="font-size: 12px; font-weight: 400; font-family: tahoma; padding: 2px">
               > {{ volume }}
             </div>
-          </div>
-        </div>
-        <div style="padding: 5px; margin-top: 20px" v-if="volume.volume_path.length">
-          <div class="level" style="margin: 0px">
-            <div class="level-left">Rename Volume</div>
-            <div class="level-right">
-              <button type="button" @click="renameVolume" :class="{'is-loading': renaming_volume}" :disabled="renaming_volume">Rename</button>
-            </div>
-          </div>
-          <div style="margin-top: 10px">
-            <input class="input" type="text" style="outline: none; box-shadow: none; font-size: 12px; padding: 10px 5px" v-model="course_folder_name">
           </div>
         </div>
       </div>
@@ -101,7 +95,7 @@ import ValidationErrors from "@/libs/validation-errors";
 import Database from "@/services/database";
 const DatabaseService = new Database();
 
-import { getVolumePath } from "@/libs/helpers";
+import { getVolumePath, server_url } from "@/libs/helpers";
 
 export default {
   created() {
@@ -113,6 +107,12 @@ export default {
   },
 
   computed: {
+    volume_path() {
+      const course_volume = `${server_url}${this.course.volume_path}`;
+
+      return course_volume.split("/");
+    },
+
     categories() {
       return this.categories_tree.categories;
     },
@@ -148,13 +148,9 @@ export default {
         table: "courses",
         title: "",
         url: "",
-        image: ""
-      },
-      volume: {
-        table: "volumes",
+        image: "",
         volume_path: ""
       },
-      course_folder_name: null,
       categories_tree: null,
       selected_category: "",
       selected_subcategory: "",
@@ -171,8 +167,8 @@ export default {
 
   methods: {
     renameVolume() {
-      const course_folder_name = this.course_folder_name;
-      const old_volume_path = this.volume.volume_path;
+      const course_folder_name = getVolumePath(this.course);
+      const old_volume_path = server_url + this.course.volume_path;
 
       const old_volume_path_array = old_volume_path.split("/");
       old_volume_path_array.pop();
@@ -188,11 +184,10 @@ export default {
 
       this.renaming_volume = true;
       fs.rename(old_volume_path, new_volume_path, () => {
-        DatabaseService.renameVolume(this.course, new_volume_path)
+        DatabaseService.renameVolume(this.course, course_folder_name)
           .then(volume => {
             if (volume) {
               this.volume = volume;
-              this.updateVolumePath();
             }
 
             this.renaming_volume = false;
@@ -201,11 +196,6 @@ export default {
             this.renaming_volume = false;
           });
       });
-    },
-
-    updateVolumePath() {
-      const course_folder_name = getVolumePath(this.course);
-      this.course_folder_name = course_folder_name;
     },
 
     openUrl(course) {
@@ -247,22 +237,11 @@ export default {
 
         DatabaseService.getCourseByCourseId(course_id)
           .then(course => {
+            this.loading = false;
             this.course = course;
             this.selected_category = course.category || "";
             this.selected_subcategory = course.subcategory || "";
             this.selected_topic = course.topic || "";
-
-            DatabaseService.getVolumeByCourseId(course_id)
-              .then(volume => {
-                this.loading = false;
-                if (volume) {
-                  this.volume = volume;
-                  this.updateVolumePath();
-                }
-              })
-              .catch(e => {
-                this.loading = false;
-              });
           })
           .catch(e => {
             this.loading = false;
@@ -293,28 +272,49 @@ export default {
     },
 
     addVolume() {
-      if (!this.selected_topic) {
+      this.adding_volume = true;
+
+      const course_id = this.course.course_id;
+      const path = dialog.showOpenDialog({
+        properties: ["openDirectory"],
+        defaultPath: server_url
+      });
+
+      if (!path) {
+        this.adding_volume = false;
+
+        return false;
+      }
+
+      const volume_path = path[0];
+
+      if (!volume_path.includes(server_url)) {
+        this.adding_volume = false;
+
         return dialog.showMessageBox(getCurrentWindow(), {
           type: "error",
-          message: "Please, choose a topic first."
+          message: "Please, choose a valid course directory."
         });
       }
 
-      this.adding_volume = true;
-      this.renaming_volume = true;
+      const chunk = volume_path.split(server_url);
 
-      const course_id = this.course.course_id;
-      const path = dialog.showOpenDialog({ properties: ["openDirectory"] });
-      const volume_path = path[0];
+      if (chunk.length != 2) {
+        this.adding_volume = false;
 
-      DatabaseService.addVolumeToCourse(course_id, volume_path)
+        return dialog.showMessageBox(getCurrentWindow(), {
+          type: "error",
+          message: "Course must be inside root directory."
+        });
+      }
+
+      DatabaseService.updateVolumePath(course_id, chunk[1])
         .then(data => {
           this.adding_volume = false;
           return this.$router.push(`/course/detail/${course_id}`);
         })
         .catch(e => {
           this.adding_volume = false;
-          this.renaming_volume = false;
         });
     }
   }

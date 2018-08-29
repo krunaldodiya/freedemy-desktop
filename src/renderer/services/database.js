@@ -1,13 +1,28 @@
 import db from "../libs/database";
 
 export default class Database {
+  getAllCourses() {
+    return new Promise((resolve, reject) => {
+      db.find({ table: "courses" }, (err, docs) => {
+        if (err) {
+          return reject(err);
+        }
+
+        return resolve({
+          data: docs,
+          count
+        });
+      });
+    });
+  }
+
   getCourses(query, page, limit) {
     const skip = page * limit;
 
     return new Promise((resolve, reject) => {
       db.count(query, (err, count) => {
-        if (query.keywords) {
-          db.find(query, (err, docs) => {
+        if (query.filter) {
+          db.find(query.data, (err, docs) => {
             if (err) {
               return reject(err);
             }
@@ -19,7 +34,7 @@ export default class Database {
           });
         }
 
-        db.find(query)
+        db.find(query.data)
           .sort({ title: 1 })
           .skip(skip)
           .limit(limit)
@@ -54,7 +69,7 @@ export default class Database {
   renameVolume(course, new_volume_path) {
     return new Promise((resolve, reject) => {
       db.update(
-        { course_id: course.course_id, table: "volumes" },
+        { course_id: course.course_id, table: "courses" },
         {
           $set: {
             volume_path: new_volume_path
@@ -67,7 +82,7 @@ export default class Database {
           }
 
           db.findOne(
-            { table: "volumes", course_id: course.course_id },
+            { table: "courses", course_id: course.course_id },
             (err, doc) => {
               if (err) {
                 return reject(err);
@@ -81,20 +96,6 @@ export default class Database {
     });
   }
 
-  getVolumeByCourseId(course_id) {
-    course_id = parseInt(course_id);
-
-    return new Promise((resolve, reject) => {
-      db.findOne({ table: "volumes", course_id }, (err, doc) => {
-        if (err) {
-          return reject(err);
-        }
-
-        return resolve(doc);
-      });
-    });
-  }
-
   deleteCourse(course_id) {
     course_id = parseInt(course_id);
 
@@ -104,24 +105,18 @@ export default class Database {
           return reject(err);
         }
 
-        db.remove({ table: "volumes", course_id }, (err, numRemoved) => {
-          if (err) {
-            return reject(err);
-          }
-
-          return resolve(numRemoved);
-        });
+        return resolve(numRemoved);
       });
     });
   }
 
-  addVolumeToCourse(course_id, volume_path) {
+  updateVolumePath(course_id, volume_path) {
     course_id = parseInt(course_id);
 
     return new Promise((resolve, reject) => {
       db.update(
-        { table: "volumes", course_id },
-        { table: "volumes", course_id, volume_path },
+        { table: "courses", course_id },
+        { $set: { volume_path } },
         { upsert: true },
         (err, doc) => {
           if (err) {
