@@ -1,6 +1,6 @@
 <template>
   <div class="columns is-12" style="padding: 20px; background: #444" v-if="!loading">      
-    <div class="column is-3" style="overflow: auto; max-height: 730px;">
+    <div class="column is-3" style="overflow: auto; max-height: 600px;">
       <ul style="margin: 0px; list-style: none;">
         <li v-for="(section, index) in tree" :key="index">
           <div style="background: black; color: white; padding: 10px" v-text="section.section"></div>
@@ -95,10 +95,11 @@ export default {
       const file_path = path.join(
         this.root_storage,
         this.course.volume_path,
-        this.selected_section,
-        this.selected_lecture
+        encodeURI(this.selected_section),
+        encodeURI(this.selected_lecture)
       );
-      return "file://" + encodeURI(file_path);
+
+      return file_path;
     },
 
     tree() {
