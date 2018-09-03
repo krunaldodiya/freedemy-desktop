@@ -28,7 +28,7 @@
         </div>
       </div>
       <div class="player-wrapper">
-        <Player v-if="load_video" :file="file" :poster="course.image"/>
+        <Player v-if="load_video && file_type == 'mp4'" :file="file" :poster="course.image"/>
       </div>
     </div>
   </div>
@@ -43,7 +43,8 @@ const fs = require("fs");
 const path = require("path");
 const extensions = [".mp4", ".m4v", ".html", ".txt", ".pdf"];
 
-import { getVolumePath, storage_url } from "@/libs/helpers";
+import { getVolumePath } from "@/libs/helpers";
+import db from "@/libs/database";
 
 export default {
   components: {
@@ -51,6 +52,10 @@ export default {
   },
 
   created() {
+    db.findOne({ table: "storage" }, (err, storage) => {
+      this.root_storage = storage.volume_path;
+    });
+
     const course_id = this.$route.params.course_id;
 
     this.loading = true;
@@ -68,6 +73,10 @@ export default {
   },
 
   computed: {
+    file_type() {
+      return this.selected_lecture.split(".").pop();
+    },
+
     selected_lecture() {
       const initial_course = this.tree[0]["courses"][0];
       return this.$route.query.lecture
@@ -84,7 +93,7 @@ export default {
 
     file() {
       const file_path = path.join(
-        storage_url,
+        this.root_storage,
         this.course.volume_path,
         this.selected_section,
         this.selected_lecture
@@ -97,7 +106,9 @@ export default {
         return [];
       }
 
-      const course_directory_path = `${storage_url}/${this.course.volume_path}`;
+      const course_directory_path = `${this.root_storage}/${
+        this.course.volume_path
+      }`;
 
       const tree = [];
 
@@ -157,7 +168,8 @@ export default {
     return {
       loading: false,
       load_video: false,
-      course: null
+      course: null,
+      root_storage: null
     };
   }
 };

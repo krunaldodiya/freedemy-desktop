@@ -76,10 +76,15 @@ const userData = app.getPath("home");
 import Database from "@/services/database";
 const DatabaseService = new Database();
 
-import { getVolumePath, storage_url } from "@/libs/helpers";
+import { getVolumePath } from "@/libs/helpers";
+import db from "@/libs/database";
 
 export default {
   created() {
+    db.findOne({ table: "storage" }, (err, storage) => {
+      this.root_storage = storage.volume_path;
+    });
+
     this.categories_tree = JSON.parse(
       fs.readFileSync(`${userData}/freedemy/categories.json`)
     );
@@ -129,6 +134,7 @@ export default {
     return {
       busy: false,
       loading: false,
+      root_storage: null,
       courses: [],
       filter_topic: null,
       filter_keywords: null,
@@ -142,8 +148,9 @@ export default {
   methods: {
     courseExists(course) {
       const course_folder_name = getVolumePath(course);
+      const full_path = `${this.root_storage}/${course_folder_name}`;
 
-      return fs.existsSync(`${storage_url}/${course_folder_name}`);
+      return fs.existsSync(full_path);
     },
 
     openUrl(course) {
@@ -172,7 +179,11 @@ export default {
 
       const keywords = this.filter_keywords;
       const topic = this.filter_topic;
-      let query = {};
+      let query = {
+        data: {
+          table: "courses"
+        }
+      };
 
       if (keywords) {
         query = {
@@ -191,7 +202,7 @@ export default {
           filter: true,
           data: {
             table: "courses",
-            "topic.title": topic.title
+            "topic.id": topic.id
           }
         };
       }

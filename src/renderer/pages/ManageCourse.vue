@@ -57,6 +57,11 @@
             </a>
           </p>
           <p class="control">
+            <router-link class="button is-default" style="color: black" :to="`/course/detail/${course.course_id}`" v-if="course.volume_path">
+              Browse Course
+            </router-link>
+          </p>
+          <p class="control">
             <a class="button is-danger" @click.prevent="deleteCourse($route.query.course_id)" :class="{'is-loading': deleting_course}" :disabled="deleting_course">
               Delete Course
             </a>
@@ -95,10 +100,15 @@ import ValidationErrors from "@/libs/validation-errors";
 import Database from "@/services/database";
 const DatabaseService = new Database();
 
-import { getVolumePath, storage_url } from "@/libs/helpers";
+import { getVolumePath } from "@/libs/helpers";
+import db from "@/libs/database";
 
 export default {
   created() {
+    db.findOne({ table: "storage" }, (err, storage) => {
+      this.root_storage = storage.volume_path;
+    });
+
     this.categories_tree = JSON.parse(
       fs.readFileSync(`${userData}/freedemy/categories.json`)
     );
@@ -108,7 +118,7 @@ export default {
 
   computed: {
     volume_path() {
-      const course_volume = `${storage_url}/${this.course.volume_path}`;
+      const course_volume = `${this.root_storage}/${this.course.volume_path}`;
 
       return course_volume.split("/");
     },
@@ -144,6 +154,7 @@ export default {
       renaming_volume: false,
       adding_volume: false,
       deleting_course: false,
+      root_storage: null,
       course: {
         table: "courses",
         title: "",
@@ -168,7 +179,7 @@ export default {
   methods: {
     renameVolume() {
       const course_folder_name = getVolumePath(this.course);
-      const old_volume_path = `${storage_url}/${this.course.volume_path}`;
+      const old_volume_path = `${this.root_storage}/${this.course.volume_path}`;
 
       const old_volume_path_array = old_volume_path.split("/");
       old_volume_path_array.pop();
@@ -277,7 +288,7 @@ export default {
       const course_id = this.course.course_id;
       const path = dialog.showOpenDialog({
         properties: ["openDirectory"],
-        defaultPath: storage_url
+        defaultPath: this.root_storage
       });
 
       if (!path) {
