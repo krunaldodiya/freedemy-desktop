@@ -28,7 +28,7 @@
         </div>
       </div>
       <div class="player-wrapper">
-        <Player v-if="load_video && file_type == 'mp4'" :file="file" :poster="course.image"/>
+        <Player v-if="file_type == 'mp4'" :file="file" :poster="course.image"/>
       </div>
     </div>
   </div>
