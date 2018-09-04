@@ -31,7 +31,7 @@
               <button type="button" class="button is-small" @click="showRootStorage">Choose Root Storage</button>
             </div>
 
-            <div style="margin-top: 5px; border: 1px solid #ccc; padding: 5px 10px; font-size: 12px; font-weight: bold" v-text="storage && storage.volume_path"></div>
+            <div style="margin-top: 5px; border: 1px solid #ccc; padding: 5px 10px; font-size: 12px; font-weight: bold" v-if="storage" v-text="storage.volume_path"></div>
           </div>
         </div>
       </div>

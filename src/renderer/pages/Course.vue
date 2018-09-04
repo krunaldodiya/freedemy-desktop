@@ -1,24 +1,24 @@
 <template>
   <div class="columns is-12" style="padding: 20px; background: #444" v-if="!loading">      
-    <div class="column is-3" style="overflow: auto; max-height: 600px;">
+    <div class="column is-2" style="overflow: auto; max-height: 480pt;">
       <ul style="margin: 0px; list-style: none;">
         <li v-for="(section, index) in tree" :key="index">
           <div style="background: black; color: white; padding: 10px" v-text="section.section"></div>
   
           <ul style="margin: 0px; list-style: none;">
             <li :class="{selected: lecture.lecture == selected_lecture}" v-for="(lecture, index) in section.courses" :key="index" @click='browse(lecture)'>
-              <div class="lecture" style="color: black; padding: 10px 20px" v-text="lecture.lecture"></div>
+              <div class="lecture" style="color: black; padding: 10px 20px; font-size: 14px" v-text="lecture.lecture"></div>
             </li>
           </ul>
         </li>
       </ul>
     </div>
 
-    <div class="column is-9" style="padding: 20px">
-      <div style="margin: 5px 10px 10px 5px">
+    <div class="column is-10" style="padding: 10px">
+      <div style="margin: 5px">
         <div class="level" style="margin: 0px; padding: 0px">
           <div class="level-left">
-            <h1 class="title" style="color: white; font-size: 22px" v-text="course.title"></h1>            
+            <h1 class="title" style="color: white; font-size: 18px; margin-left: 10px" v-text="course.title"></h1>            
           </div>
           <div class="level-right">
             <router-link :to="`/course/manage?course_id=${course.course_id}`" style="padding-left: 5px; color: white">
@@ -93,8 +93,9 @@ export default {
 
     file() {
       const file_path = path.join(
-        this.root_storage,
-        this.course.volume_path,
+        "file:///",
+        encodeURI(this.root_storage),
+        encodeURI(this.course.volume_path),
         encodeURI(this.selected_section),
         encodeURI(this.selected_lecture)
       );
@@ -184,6 +185,7 @@ export default {
 .player-wrapper {
   background: #444;
   width: 100%;
+  padding: 10px;
 }
 
 li > ul > li {

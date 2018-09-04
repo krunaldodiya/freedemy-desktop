@@ -8,7 +8,7 @@
           </div>
 
           <div style="padding: 5px; margin-top: 5px; font-size: 10px; text-transform: uppercase; cursor: pointer" v-if="filter_topic" @click="clear_filter('filter_topic')">clear filters</div>
-          <div style="max-height: 650px; overflow: auto; border: 1px solid #e2dbdb; margin-top: 5px; padding: 0px">
+          <div style="max-height: 480pt; overflow: auto; border: 1px solid #e2dbdb; margin-top: 5px; padding: 0px">
             <div v-for="(tree, index) in topics" :key="index" v-if="tree.topics.length">
               <div v-text="tree.category.title" style="cursor: pointer; background: #e2dbdb; color: black; padding: 5px"></div>
               <div v-for="(topic, index) in tree.topics" :key="index" style="padding: 5px" :class="{'selected-topic': filter_topic && filter_topic.id == topic.id}">
