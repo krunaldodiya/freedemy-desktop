@@ -286,9 +286,11 @@ export default {
       this.adding_volume = true;
 
       const course_id = this.course.course_id;
+      const storage_url = this.root_storage;
+
       const path = dialog.showOpenDialog({
         properties: ["openDirectory"],
-        defaultPath: this.root_storage
+        defaultPath: storage_url
       });
 
       if (!path) {
